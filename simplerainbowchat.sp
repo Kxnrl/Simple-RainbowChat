@@ -11,7 +11,7 @@ public Plugin myinfo =
 	name		= "Simple Rainbow Chat",
 	author		= "Kyle",
 	description	= "Rainbow chat",
-	version		= "1.0",
+	version		= "1.1",
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
@@ -74,7 +74,6 @@ void String_Rainbow(const char[] input, char[] output, int maxLen)
 	int bytes, buffs;
 	int size = strlen(input)+1;
 	char[] copy = new char [size];
-	char color[2];
 
 	for(int x = 0; x < size; ++x)
 	{
@@ -83,10 +82,10 @@ void String_Rainbow(const char[] input, char[] output, int maxLen)
 		
 		if(buffs == 2)
 		{
-			RandomColor(color);
 			strcopy(copy, size, input);
 			copy[x+1] = '\0';
-			bytes += StrCat(output, maxLen, color);
+			output[bytes] = RandomColor();
+			bytes++;
 			bytes += StrCat(output, maxLen, copy[x-buffs]);
 			buffs = 0;
 			continue;
@@ -98,10 +97,10 @@ void String_Rainbow(const char[] input, char[] output, int maxLen)
 			continue;
 		}
 
-		RandomColor(color);
 		strcopy(copy, size, input);
 		copy[x+1] = '\0';
-		bytes += StrCat(output, maxLen, color);
+		output[bytes] = RandomColor();
+		bytes++;
 		bytes += StrCat(output, maxLen, copy[x]);
 	}
 
@@ -116,25 +115,28 @@ bool IsChar(char c)
 	return false;
 }
 
-void RandomColor(char color[2])
+int RandomColor()
 {
 	switch(GetRandomInt(1, 16))
 	{
-		case  1: strcopy(color, 2, "\x01");
-		case  2: strcopy(color, 2, "\x02");
-		case  3: strcopy(color, 2, "\x03");
-		case  4: strcopy(color, 2, "\x03");
-		case  5: strcopy(color, 2, "\x04");
-		case  6: strcopy(color, 2, "\x05");
-		case  7: strcopy(color, 2, "\x06");
-		case  8: strcopy(color, 2, "\x07");
-		case  9: strcopy(color, 2, "\x08");
-		case 10: strcopy(color, 2, "\x09");
-		case 11: strcopy(color, 2, "\x10");
-		case 12: strcopy(color, 2, "\x0A");
-		case 13: strcopy(color, 2, "\x0B");
-		case 14: strcopy(color, 2, "\x0C");
-		case 15: strcopy(color, 2, "\x0E");
-		case 16: strcopy(color, 2, "\x0F");
+		case  1: return '\x01';
+		case  2: return '\x02';
+		case  3: return '\x03';
+		case  4: return '\x03';
+		case  5: return '\x04';
+		case  6: return '\x05';
+		case  7: return '\x06';
+		case  8: return '\x07';
+		case  9: return '\x08';
+		case 10: return '\x09';
+		case 11: return '\x10';
+		case 12: return '\x0A';
+		case 13: return '\x0B';
+		case 14: return '\x0C';
+		case 15: return '\x0E';
+		case 16: return '\x0F';
+		default: return '\x01';
 	}
+
+	return '\x01';
 }
