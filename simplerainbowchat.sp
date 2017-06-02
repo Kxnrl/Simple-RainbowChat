@@ -1,10 +1,15 @@
 #include <sdktools>
 
+#pragma newdecls required
+
 ConVar g_cvarName;
 ConVar g_cvarMesasge;
 
 int g_flagName;
 int g_flagMessage;
+
+bool g_bUse4Name[MAXPLAYERS+1];
+bool g_bUse4Message[MAXPLAYERS+1];
 
 public Plugin myinfo = 
 {
@@ -15,7 +20,6 @@ public Plugin myinfo =
 	url			= "http://steamcommunity.com/id/_xQy_/"
 };
 
-
 public void OnPluginStart()
 {
 	g_cvarName = CreateConVar("src_name_flag", "b", "Set flag for vip must have to get access to rainbow chat name feature", FCVAR_NOTIFY);
@@ -25,6 +29,9 @@ public void OnPluginStart()
 	HookConVarChange(g_cvarMesasge, HookConVar);
 	
 	AutoExecConfig(true);
+	
+	RegConsoleCmd("sm_rainbowname", Command_Name);
+	RegConsoleCmd("sm_rainbowmsg", Command_Message);
 }
 
 public void OnConfigsExecuted()
@@ -46,11 +53,47 @@ public void HookConVar(ConVar convar, const char[] oldValue, const char[] newVal
 		g_flagMessage = ReadFlagString(newValue)
 }
 
+public void OnClientConnected(int client)
+{
+	g_bUse4Name[client] = false;
+	g_bUse4Message[client] = false;
+}
+
+public Action Command_Name(int client, int args)
+{
+	if(g_flagName != 0 && !(GetUserFlagBits(client) & g_flagName))
+	{
+		PrintToChat(client, "[SM] You do not have access to this command");
+		return Plugin_Handled;
+	}
+	
+	g_bUse4Name[client] = !g_bUse4Name[client];
+	
+	PrintToChat(client, "[SM] rainbow name is %s", g_bUse4Name[client] ? "enabled" : "disabled");
+	
+	return Plugin_Handled;
+}
+
+public Action Command_Message(int client, int args)
+{
+	if(g_flagMessage != 0 && !(GetUserFlagBits(client) & g_flagMessage))
+	{
+		PrintToChat(client, "[SM] You do not have access to this command");
+		return Plugin_Handled;
+	}
+	
+	g_bUse4Message[client] = !g_bUse4Message[client];
+	
+	PrintToChat(client, "[SM] rainbow message is %s", g_bUse4Message[client] ? "enabled" : "disabled");
+
+	return Plugin_Handled;
+}
+
 public Action CP_OnChatMessage(int& client, ArrayList recipients, char[] flagstring, char[] name, char[] message, bool &processcolors, bool &removecolors)
 {
 	Action result = Plugin_Continue;
 
-	if(g_flagName == 0 || GetUserFlagBits(client) & g_flagName)
+	if((g_flagName == 0 || GetUserFlagBits(client) & g_flagName) && g_bUse4Name[client])
 	{
 		char newname[128];
 		String_Rainbow(name, newname, 256);
@@ -58,14 +101,14 @@ public Action CP_OnChatMessage(int& client, ArrayList recipients, char[] flagstr
 		result = Plugin_Changed;
 	}
 	
-	if(g_flagMessage == 0 || GetUserFlagBits(client) & g_flagMessage)
+	if((g_flagMessage == 0 || GetUserFlagBits(client) & g_flagMessage) && g_bUse4Message[client])
 	{
 		char newmsg[256];
 		String_Rainbow(message, newmsg, 256);
 		strcopy(message, 256, newmsg);
 		result = Plugin_Changed;
 	}
-	
+
 	return result;
 }
 

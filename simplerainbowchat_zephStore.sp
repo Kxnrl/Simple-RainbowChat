@@ -1,5 +1,7 @@
 #include <store>
 
+#pragma newdecls required
+
 char g_szNameTags[STORE_MAX_ITEMS][128];
 char g_szNameColors[STORE_MAX_ITEMS][32];
 char g_szMessageColors[STORE_MAX_ITEMS][32];
